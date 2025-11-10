@@ -2,10 +2,10 @@
 
 module MachineControl_tb;
 
-reg [4:0] mot_err;
-reg [2:0] fail_sensn;
-reg       clk;
-reg       rstn;
+reg  [4:0] mot_err;
+reg  [2:0] fail_sensn;
+reg        clk;
+reg        rstn;
 wire [4:0] mot_ena;
 wire       led_green;
 wire       led_red;
@@ -45,7 +45,7 @@ initial begin
 	#100
 	mot_err    = 5'b00000;
 	fail_sensn = 3'b111;
-	#100
+	#5000
 	$stop; //$finish; 
 end
 

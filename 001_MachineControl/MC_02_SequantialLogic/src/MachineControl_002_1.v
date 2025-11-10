@@ -33,7 +33,7 @@ assign LED_GREEN = state ? led_green : 1'b0;
 
 
 wire 	led_red;
-Counter #(100, 20)	counter_led_red
+Counter #(150, 100)	counter_led_red
 (
 	.RSTn		(RSTn),
 	.CLK		(CLK),
