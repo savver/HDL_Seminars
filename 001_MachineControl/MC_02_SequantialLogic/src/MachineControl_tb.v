@@ -34,10 +34,15 @@ initial begin
 	rstn = 1'b0;
 	mot_err    = 5'b00000;
 	fail_sensn = 3'b111;
+	
 	#10
 	rstn       = 1'b1;
-	#100
+	
+	//wait for green led blinking (then no errors
+	//emulate error after this delay
+	#2000	
 	mot_err    = 5'b00001;
+	
 	#100
 	mot_err    = 5'b00000;
 	#100
@@ -45,7 +50,7 @@ initial begin
 	#100
 	mot_err    = 5'b00000;
 	fail_sensn = 3'b111;
-	#5000
+	#15000
 	$stop; //$finish; 
 end
 
