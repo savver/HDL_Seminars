@@ -17,4 +17,16 @@ DgsBlink_v1			dsg_blink_1
 	.LED_OUT	(LEDs[0])
 );
 
+defparam dsg_blink_2.FREQ_HZ	 = 100*1000*1000;
+defparam dsg_blink_2.PERIOD_US = 10;
+defparam dsg_blink_2.PULSE_US =  1;
+//
+DgsBlink_v2			dsg_blink_2
+(
+	.CLK			(CLK),
+	.RSTn			(RSTn),
+	.BLINK_CNT	(2),
+	.LED_OUT		(LEDs[1])
+);
+
 endmodule 

@@ -6,56 +6,70 @@ __|   |___|   |___|   |___|   |___|   |___
     1       2       3       4       5
 */
 
-module DgsBlink_v1
+module DgsBlink_v2
 #(
    parameter FREQ_HZ    = 100*1000*1000,
 	parameter PERIOD_US	= 10,
-	parameter PULSE_US   = 1
- //parameter QUANT_CNT  = 5
+	parameter PULSE_US   = 1,
+	
+   parameter QUANT_CNT = (PERIOD_US / PULSE_US) / 2
 )
 (
-	input 		 				CLK,
-	input 		 				RSTn,
-	input [QUANT_CNT-1:0]	MASK,
-	output 		 				LED_OUT
+	input 		 				      CLK,
+	input 		 				      RSTn,
+	input [$clog2(QUANT_CNT)-1:0]	BLINK_CNT,
+	output 		 				      LED_OUT
 );
 
 localparam PERIOD = (FREQ_HZ/(1000*1000)) * PERIOD_US;
 localparam PULSE  = (FREQ_HZ/(1000*1000)) * PULSE_US;
-localparam QUANT_CNT = (PERIOD_US / PULSE_US) / 2;
+localparam QUANT_PERIOD  = 2 * PULSE;
 
-reg [$clog2(PERIOD-1)-1:0] cntr;
-reg [QUANT_CNT-1:0]	    mask;
+reg [$clog2(QUANT_PERIOD-1)-1:0] cntr;
+reg [$clog2(QUANT_CNT)-1:0]	 blink_cnt;
+reg [$clog2(QUANT_CNT)-1:0]	 quant_cnt;
 
 always @(posedge CLK)
 begin
 	if(!RSTn)
 	  begin
-		 cntr <= 0;
+		 cntr      <= 0;
+		 blink_cnt <= BLINK_CNT;
+		 quant_cnt <= QUANT_CNT - 1;
 	  end
 	else
 	  begin
-	    if(cntr == PERIOD-1)
+	    if(cntr == QUANT_PERIOD-1)
 		   begin
+			
 			  cntr <= 0;
-			  mask <= MASK;
+			  
+			  if(blink_cnt != 0) 
+			    blink_cnt = blink_cnt - 1'b1;
+				 
+			  if(quant_cnt != 0) 
+			    quant_cnt = quant_cnt - 1'b1;
+			  else
+			    begin
+				   blink_cnt <= BLINK_CNT;
+		         quant_cnt <= QUANT_CNT - 1;
+				 end	
+				 
 		   end 
 		 else 
 		    cntr <= cntr + 1'b1;
 	  end
 end
 
+
 wire   led;
 assign LED_OUT = (!RSTn) ? 1'b0 : led;
-assign led = ((mask & (1<<0)) && ((cntr >= 0*PULSE) && (cntr < 1*PULSE))) ||
-             ((mask & (1<<1)) && ((cntr >= 2*PULSE) && (cntr < 3*PULSE))) ||
-				 ((mask & (1<<2)) && ((cntr >= 4*PULSE) && (cntr < 5*PULSE))) ||
-				 ((mask & (1<<3)) && ((cntr >= 6*PULSE) && (cntr < 7*PULSE))) ||
-				 ((mask & (1<<4)) && ((cntr >= 8*PULSE) && (cntr < 9*PULSE)));
+assign led = ((cntr < PULSE) && (blink_cnt != 0)) ? 1 : 0;
 				 			 
 endmodule 
 
 /* calculations:
+
 FREQ_HZ = 100*1000*1000
 PERIOD_US = 10
 PULSE_US = 1
