@@ -80,7 +80,7 @@ assign LED_RED   =  fault_latched ? led_red   : 1'b0;
 
 //--- v1
 `ifdef USE_ASSIGN_MOT_ENA_V1
-	assign MOT_ENA[4:0] = fault_latched ? 5'b0000 : 5'b1111;
+	assign MOT_ENA[4:0] = fault_latched ? 5'b00000 : 5'b11111;
 `endif
 //--- v2
 `ifdef USE_ASSIGN_MOT_ENA_V2
