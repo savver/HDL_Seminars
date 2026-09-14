@@ -1,4 +1,4 @@
-module MachineControl_02
+module MachineControl_02_top
 (
 	input 		 CLK,
 	input        RSTn,

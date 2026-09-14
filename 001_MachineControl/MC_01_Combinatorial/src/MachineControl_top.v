@@ -1,4 +1,4 @@
-module MachineControl
+module MachineControl_top
 (
 	input [4:0]  MOT_ERR,
 	input [2:0]  FAIL_SENSn,
