@@ -1,16 +1,16 @@
 /*<simulation_settings>
-<ftestbench_cmd>quartus_eda --gen_testbench --tool=modelsim_oem --format=verilog --write_settings_files=off MachineControl -c MachineControl --vector_source="Z:/_WORK_/RL1_Seminars/GIT_HDL_Seminars/001_MachineControl/Altera_Max10_DE10lite_quartus/Waveform.vwf" --testbench_file="Z:/_WORK_/RL1_Seminars/GIT_HDL_Seminars/001_MachineControl/Altera_Max10_DE10lite_quartus/simulation/qsim/Waveform.vwf.vt"</ftestbench_cmd>
-<ttestbench_cmd>quartus_eda --gen_testbench --tool=modelsim_oem --format=verilog --write_settings_files=off MachineControl -c MachineControl --vector_source="Z:/_WORK_/RL1_Seminars/GIT_HDL_Seminars/001_MachineControl/Altera_Max10_DE10lite_quartus/Waveform.vwf" --testbench_file="Z:/_WORK_/RL1_Seminars/GIT_HDL_Seminars/001_MachineControl/Altera_Max10_DE10lite_quartus/simulation/qsim/Waveform.vwf.vt"</ttestbench_cmd>
-<fnetlist_cmd>quartus_eda --write_settings_files=off --simulation --functional=on --flatten_buses=off --tool=modelsim_oem --format=verilog --output_directory="Z:/_WORK_/RL1_Seminars/GIT_HDL_Seminars/001_MachineControl/Altera_Max10_DE10lite_quartus/simulation/qsim/" MachineControl -c MachineControl</fnetlist_cmd>
-<tnetlist_cmd>quartus_eda --write_settings_files=off --simulation --functional=off --flatten_buses=off --timescale=1ps --tool=modelsim_oem --format=verilog --output_directory="Z:/_WORK_/RL1_Seminars/GIT_HDL_Seminars/001_MachineControl/Altera_Max10_DE10lite_quartus/simulation/qsim/" MachineControl -c MachineControl</tnetlist_cmd>
+<ftestbench_cmd>quartus_eda --gen_testbench --tool=modelsim_oem --format=verilog --write_settings_files=off MachineControl -c MachineControl --vector_source="D:/RL1_DGI_HDL/HDL_Seminars/001_MachineControl/MC_01_Combinatorial/Altera_Max10_DE10lite_quartus/Waveform.vwf" --testbench_file="D:/RL1_DGI_HDL/HDL_Seminars/001_MachineControl/MC_01_Combinatorial/Altera_Max10_DE10lite_quartus/simulation/qsim/Waveform.vwf.vt"</ftestbench_cmd>
+<ttestbench_cmd>quartus_eda --gen_testbench --tool=modelsim_oem --format=verilog --write_settings_files=off MachineControl -c MachineControl --vector_source="D:/RL1_DGI_HDL/HDL_Seminars/001_MachineControl/MC_01_Combinatorial/Altera_Max10_DE10lite_quartus/Waveform.vwf" --testbench_file="D:/RL1_DGI_HDL/HDL_Seminars/001_MachineControl/MC_01_Combinatorial/Altera_Max10_DE10lite_quartus/simulation/qsim/Waveform.vwf.vt"</ttestbench_cmd>
+<fnetlist_cmd>quartus_eda --write_settings_files=off --simulation --functional=on --flatten_buses=off --tool=modelsim_oem --format=verilog --output_directory="D:/RL1_DGI_HDL/HDL_Seminars/001_MachineControl/MC_01_Combinatorial/Altera_Max10_DE10lite_quartus/simulation/qsim/" MachineControl -c MachineControl</fnetlist_cmd>
+<tnetlist_cmd>quartus_eda --write_settings_files=off --simulation --functional=off --flatten_buses=off --timescale=1ps --tool=modelsim_oem --format=verilog --output_directory="D:/RL1_DGI_HDL/HDL_Seminars/001_MachineControl/MC_01_Combinatorial/Altera_Max10_DE10lite_quartus/simulation/qsim/" MachineControl -c MachineControl</tnetlist_cmd>
 <modelsim_script>onerror {exit -code 1}
 vlib work
 vlog -work work MachineControl.vo
 vlog -work work Waveform.vwf.vt
-vsim -novopt -c -t 1ps -L fiftyfivenm_ver -L altera_ver -L altera_mf_ver -L 220model_ver -L sgate_ver -L altera_lnsim_ver work.MachineControl_vlg_vec_tst
+vsim -novopt -c -t 1ps -L fiftyfivenm_ver -L altera_ver -L altera_mf_ver -L 220model_ver -L sgate_ver -L altera_lnsim_ver work.MachineControl_top_vlg_vec_tst
 vcd file -direction MachineControl.msim.vcd
-vcd add -internal MachineControl_vlg_vec_tst/*
-vcd add -internal MachineControl_vlg_vec_tst/i1/*
+vcd add -internal MachineControl_top_vlg_vec_tst/*
+vcd add -internal MachineControl_top_vlg_vec_tst/i1/*
 proc simTimestamp {} {
     echo "Simulation time: $::now ps"
     if { [string equal running [runStatus]] } {
@@ -25,10 +25,10 @@ quit -f
 vlib work
 vlog -work work MachineControl.vo
 vlog -work work Waveform.vwf.vt
-vsim -novopt -c -t 1ps -L fiftyfivenm_ver -L altera_ver -L altera_mf_ver -L 220model_ver -L sgate_ver -L altera_lnsim_ver work.MachineControl_vlg_vec_tst
+vsim -novopt -c -t 1ps -L fiftyfivenm_ver -L altera_ver -L altera_mf_ver -L 220model_ver -L sgate_ver -L altera_lnsim_ver work.MachineControl_top_vlg_vec_tst
 vcd file -direction MachineControl.msim.vcd
-vcd add -internal MachineControl_vlg_vec_tst/*
-vcd add -internal MachineControl_vlg_vec_tst/i1/*
+vcd add -internal MachineControl_top_vlg_vec_tst/*
+vcd add -internal MachineControl_top_vlg_vec_tst/i1/*
 proc simTimestamp {} {
     echo "Simulation time: $::now ps"
     if { [string equal running [runStatus]] } {
