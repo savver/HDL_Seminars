@@ -1,6 +1,8 @@
+	`define USE_WIDTH_V1
+ //`define USE_WIDTH_V2
+
 module Counter 
 #(
-	//parameter PERIOD_ROW = 7,
 	parameter PERIOD     = 100,
 	parameter DUTY       = 30
 )
@@ -10,12 +12,16 @@ module Counter
 	output	OUT
 );
 
-//localparam PERIOD = 100;
-//localparam DUTY   = 30;
+`ifdef USE_WIDTH_V1
+	// 100 -> 128, 2**7
+	reg [$clog2(PERIOD) - 1:0]	counter;
+`endif
 
-// 100 -> 128, 2**7
-reg [$clog2(PERIOD) - 1:0]	counter;
-
+`ifdef USE_WIDTH_V2
+	// overkill safety
+	localparam COUNTER_WIDTH = (PERIOD <= 1) ? 1 : $clog2(PERIOD);
+	reg [COUNTER_WIDTH-1:0] counter;
+`endif
 
 always @(posedge CLK) 
 begin
@@ -32,6 +38,7 @@ begin
 
 end
 
-assign OUT = (counter < DUTY) ? 1'b1 : 1'b0;
+//assign OUT = (counter < DUTY) ? 1'b1 : 1'b0; - избыточно
+  assign OUT = (counter < DUTY);
 
 endmodule 

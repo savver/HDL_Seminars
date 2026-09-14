@@ -24,6 +24,13 @@
 а мигает. Аналогично, при аварии - мигает красная лампочка
 Т.о. тут уже последовательная логика, появляются триггеры
 */
+
+
+ //`define USE_ASSIGN_MOT_ENA_V1
+ //`define USE_ASSIGN_MOT_ENA_V2
+	`define USE_ASSIGN_MOT_ENA_V3_OK
+	
+	
 module MachineControl_002_1
 (
    input        RSTn,
@@ -35,39 +42,53 @@ module MachineControl_002_1
 	output 	    LED_RED
 );
 
-reg state; // 1 - no crash
+wire 	fault_now;
+reg 	fault_latched;  //0 = аварии нет, 1 = авария защёлкнута
+
+assign fault_now = (|MOT_ERR) | (~&FAIL_SENSn);
+
 
 always @(posedge CLK) begin
 
-  if(!RSTn)
-    state <= 1'b1;
-  else 
-    state <= (!MOT_ERR[4]    &  !MOT_ERR[3]    & !MOT_ERR[2]     & !MOT_ERR[1] & !MOT_ERR[0] &
-               FAIL_SENSn[2] &   FAIL_SENSn[1] &  FAIL_SENSn[0]) &
-				 (state == 1'b1) ; 
-
+    if (!RSTn)
+        fault_latched <= 1'b0;
+		  
+    else if (fault_now)
+        fault_latched <= 1'b1;
 end
 
-wire 		led_green;
+
+wire  led_green;
+wire 	led_red;
+
 Counter 		counter_led_green
 (
 	.RSTn		(RSTn),
 	.CLK		(CLK),
 	.OUT		(led_green)
 );
-assign LED_GREEN = state ? led_green : 1'b0;
 
-
-wire 	led_red;
 Counter #(150, 100)	counter_led_red
 (
 	.RSTn		(RSTn),
 	.CLK		(CLK),
 	.OUT		(led_red)
 );
-assign LED_RED = !state ? led_red : 1'b0;
 
+assign LED_GREEN = !fault_latched ? led_green : 1'b0;
+assign LED_RED   =  fault_latched ? led_red   : 1'b0;
 
-assign MOT_ENA[4:0] = !state ? 4'b0000 : 4'b1111;
+//--- v1
+`ifdef USE_ASSIGN_MOT_ENA_V1
+	assign MOT_ENA[4:0] = fault_latched ? 5'b0000 : 5'b1111;
+`endif
+//--- v2
+`ifdef USE_ASSIGN_MOT_ENA_V2
+	assign MOT_ENA = {5{!fault_latched}};
+`endif
+//--- v3
+`ifdef USE_ASSIGN_MOT_ENA_V3_OK
+	assign MOT_ENA = {5{RSTn & !fault_latched}};
+`endif
 
 endmodule 
