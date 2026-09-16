@@ -12,10 +12,12 @@ MASK - маска выспышек, кажды бит отвечает за св
 module DgsBlink_v1
 #(
  //parameter        FREQ_HZ    = 100*1000*1000,
-   parameter [63:0] FREQ_HZ    = 100*1000*1000,
+   parameter [63:0] FREQ_HZ    = 64'd100*1000*1000,
 	
-	parameter [63:0] PERIOD_US	= 10,
-	parameter        PULSE_US   = 1
+	parameter        PERIOD_US	= 10,
+	parameter        PULSE_US   = 1,
+	
+	parameter        QUANT_CNT  = 5 //по сути fix, если используем комбинатор схему assign led ниже
 )
 (
 	input 		 				CLK,
@@ -24,15 +26,14 @@ module DgsBlink_v1
 	output 		 				LED_OUT
 );
 
-//localparam        PERIOD = (FREQ_HZ/(1000*1000)) * PERIOD_US; - дробная часть потерялась ещё до умножения.
+//localparam        PERIOD = (FREQ_HZ/(1000*1000)) * PERIOD_US; // дробная часть потерялась ещё до умножения.
 //localparam        PERIOD = (FREQ_HZ * PERIOD_US) / 1_000_000; // но м быть переполнение
   localparam [63:0] PERIOD = (FREQ_HZ * PERIOD_US) / 1_000_000; //множители тоже д быть повышенной разрядности
-  
+
 //localparam        PULSE  = (FREQ_HZ/(1000*1000)) * PULSE_US;
 //localparam        PULSE  = (FREQ_HZ * PULSE_US) / 1_000_000;
-  localparam [63:0] PULSE = (FREQ_HZ * PERIOD_US) / 1_000_000;
-  
-  localparam QUANT_CNT  = 5; //по сути fix, если используем комбинатор схему assign led ниже
+  localparam [63:0] PULSE = (FREQ_HZ * PULSE_US) / 1_000_000;
+
 
 reg [$clog2(PERIOD-1)-1:0] cntr;
 reg [QUANT_CNT-1:0]	    mask;
