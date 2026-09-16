@@ -25,9 +25,13 @@ module DgsBlink_v2
 	output 		 				      LED_OUT
 );
 
-localparam PERIOD = (FREQ_HZ/(1000*1000)) * PERIOD_US;
-localparam PULSE  = (FREQ_HZ/(1000*1000)) * PULSE_US;
-localparam QUANT_PERIOD  = 2 * PULSE;
+//localparam PERIOD = (FREQ_HZ/(1000*1000)) * PERIOD_US; - дробная часть потерялась ещё до умножения.
+  localparam PERIOD = (FREQ_HZ * PERIOD_US) / 1_000_000;
+  
+//localparam PULSE  = (FREQ_HZ/(1000*1000)) * PULSE_US;
+  localparam PULSE  = (FREQ_HZ * PULSE_US) / 1_000_000;
+  
+  localparam QUANT_PERIOD  = 2 * PULSE;
 
 reg [$clog2(QUANT_PERIOD-1)-1:0] cntr;
 reg [$clog2(QUANT_CNT)-1:0]	 blink_cnt;
@@ -49,10 +53,10 @@ begin
 			  cntr <= 0;
 			  
 			  if(blink_cnt != 0) 
-			    blink_cnt = blink_cnt - 1'b1;
+			    blink_cnt <= blink_cnt - 1'b1;
 				 
 			  if(quant_cnt != 0) 
-			    quant_cnt = quant_cnt - 1'b1;
+			    quant_cnt <= quant_cnt - 1'b1;
 			  else
 			    begin
 				   blink_cnt <= BLINK_CNT;
