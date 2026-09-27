@@ -26,15 +26,6 @@
 Эталонная модель testbench считает фазу независимо от внутренних счетчиков DUT.
 Выходы проверяются на каждом negedge CLK. Оператор !== намеренно используется
 вместо !=, поэтому X и Z также считаются ошибкой.
-
-ВАЖНО:
-В присланном DgsBlink_v1.v сейчас есть опечатка:
-
-    localparam [63:0] PULSE =
-        (FREQ_HZ * PERIOD_US) / 1_000_000;
-
-Здесь должен использоваться PULSE_US. Пока строка не исправлена, тест v1
-ожидаемо покажет FAIL. Это полезно: testbench должен находить ошибку DUT.
 -------------------------------------------------------------------------------
 */
 
@@ -46,61 +37,45 @@ localparam [63:0] PERIOD_US_TB = 64'd10;
 localparam [63:0] PULSE_US_TB  = 64'd1;
 
 // Эталонные значения задаем явно и не вычисляем той же формулой, что DUT.
-localparam integer PERIOD_CYCLES = 20;
-localparam integer PULSE_CYCLES  = 2;
-localparam integer QUANT_CYCLES  = 4;
+localparam integer PERIOD_CYCLES = 20;   //период индикации модуля мигания, в тактах
+localparam integer PULSE_CYCLES  = 2;    //интервал, когда лед горит, в тактах
+localparam integer QUANT_CYCLES  = 4;    //длительность кванта, в тактах
 localparam integer QUANT_CNT     = 5;
 
 // Дополнительная конфигурация DgsBlink_v1_2:
 // PERIOD=12 мкс, PULSE=2 мкс -> 3 кванта, 24 такта на полный период.
 localparam [63:0] ALT_PERIOD_US = 64'd12;
 localparam [63:0] ALT_PULSE_US  = 64'd2;
-localparam integer ALT_PERIOD_CYCLES = 24;
-localparam integer ALT_PULSE_CYCLES  = 4;
-localparam integer ALT_QUANT_CYCLES  = 8;
+localparam integer ALT_PERIOD_CYCLES = 24;  //период индикации модуля мигания, в тактах
+localparam integer ALT_PULSE_CYCLES  = 4;   //интервал, когда лед горит, в тактах
+localparam integer ALT_QUANT_CYCLES  = 8;   //длительность кванта, в тактах
 localparam integer ALT_QUANT_CNT     = 3;
 
 // CLK = 2 МГц -> полупериод 250 нс.
 localparam integer CLK_HALF_PERIOD_NS = 250;
 
-reg clk;
 reg rstn;
-
-reg  [QUANT_CNT-1:0] mask_v1;
-wire                 led_v1;
-
-reg  [QUANT_CNT-1:0] mask_v1_2;
-wire                 led_v1_2;
-
-reg  [$clog2(QUANT_CNT)-1:0] blink_cnt_v2;
-wire                         led_v2;
-
-reg  [ALT_QUANT_CNT-1:0] mask_v1_2_alt;
-wire                     led_v1_2_alt;
 
 integer checks;
 integer errors;
 integer printed_errors;
 
-// Состояние независимой эталонной модели.
-integer 							ref_phase;
-integer 							ref_phase_alt;
-reg    [QUANT_CNT-1:0]     ref_mask_v1;
-reg    [QUANT_CNT-1:0]     ref_mask_v1_2;
-integer                 	ref_blink_cnt_v2;
-reg    [ALT_QUANT_CNT-1:0] ref_mask_v1_2_alt;
+// -----------------------------------------------------------------------------
+// Генератор тактовой частоты.
+// -----------------------------------------------------------------------------
+reg clk;
 
-integer quant_index;
-integer quant_index_alt;
-reg expected_led_v1;
-reg expected_led_v1_2;
-reg expected_led_v2;
-reg expected_led_v1_2_alt;
-
+initial begin
+    clk = 1'b0;
+    forever #CLK_HALF_PERIOD_NS clk = ~clk;
+end
 
 // -----------------------------------------------------------------------------
 // DUT #1: исходная версия по маске
 // -----------------------------------------------------------------------------
+reg  [QUANT_CNT-1:0] mask_v1;  //'задание' на индикацию
+wire                 led_v1;   // рез-т, мигание
+
 DgsBlink_v1 #( .FREQ_HZ   (FREQ_HZ_TB),
                .PERIOD_US (PERIOD_US_TB),
                .PULSE_US  (PULSE_US_TB) ) 
@@ -116,6 +91,9 @@ dut_v1
 // -----------------------------------------------------------------------------
 // DUT #2: универсальная версия по маске, 5 квантов
 // -----------------------------------------------------------------------------
+reg  [QUANT_CNT-1:0] mask_v1_2;
+wire                 led_v1_2;
+
 DgsBlink_v1_2 #( .FREQ_HZ   (FREQ_HZ_TB),
                  .PERIOD_US (PERIOD_US_TB),
                  .PULSE_US  (PULSE_US_TB) ) 
@@ -131,10 +109,13 @@ dut_v1_2
 // -----------------------------------------------------------------------------
 // DUT #3: версия по количеству вспышек
 // -----------------------------------------------------------------------------
+reg  [$clog2(QUANT_CNT)-1:0] blink_cnt_v2;  //'задание' на индикацию
+wire                         led_v2;
+
 DgsBlink_v2 #( .FREQ_HZ    (FREQ_HZ_TB),
-					.PERIOD_US  (PERIOD_US_TB),
-					.PULSE_US   (PULSE_US_TB),
-					.QUANT_CNT  (QUANT_CNT) ) 
+               .PERIOD_US  (PERIOD_US_TB),
+               .PULSE_US   (PULSE_US_TB),
+               .QUANT_CNT  (QUANT_CNT) ) 
 dut_v2 
 (
     .CLK       (clk),
@@ -147,9 +128,12 @@ dut_v2
 // -----------------------------------------------------------------------------
 // DUT #4: универсальная версия с 3 квантами
 // -----------------------------------------------------------------------------
+reg  [ALT_QUANT_CNT-1:0] mask_v1_2_alt;  //'задание' на индикацию
+wire                     led_v1_2_alt;
+
 DgsBlink_v1_2 #( .FREQ_HZ   (FREQ_HZ_TB),
-					  .PERIOD_US (ALT_PERIOD_US),
-					  .PULSE_US  (ALT_PULSE_US) ) 
+                 .PERIOD_US (ALT_PERIOD_US),
+                 .PULSE_US  (ALT_PULSE_US) ) 
 dut_v1_2_alt 
 (
     .CLK     (clk),
@@ -159,17 +143,17 @@ dut_v1_2_alt
 );
 
 
-// Генератор тактовой частоты.
-initial begin
-    clk = 1'b0;
-    forever #CLK_HALF_PERIOD_NS clk = ~clk;
-end
-
-
 // -----------------------------------------------------------------------------
 // Эталонная модель для основной конфигурации.
 // Новая команда фиксируется только на границе полного периода.
 // -----------------------------------------------------------------------------
+// Состояние независимой эталонной модели.
+integer                    ref_phase;
+
+reg    [QUANT_CNT-1:0]     ref_mask_v1;     //сохраняем копию задания
+reg    [QUANT_CNT-1:0]     ref_mask_v1_2;
+integer                    ref_blink_cnt_v2;
+
 always @(posedge clk) begin
     if (!rstn) begin
         ref_phase        <= 0;
@@ -192,6 +176,9 @@ end
 
 
 // Эталонная модель дополнительного экземпляра v1_2 с тремя квантами.
+integer                    ref_phase_alt;
+reg    [ALT_QUANT_CNT-1:0] ref_mask_v1_2_alt;
+
 always @(posedge clk) begin
     if (!rstn) begin
         ref_phase_alt     <= 0;
@@ -216,8 +203,8 @@ end
 // -----------------------------------------------------------------------------
 task print_error;
     input [8*32-1:0] signal_name;
-    input            actual_value;
-    input            expected_value;
+    input            actual_value;   //фактический на выходе модуля мигания
+    input            expected_value; //'ожидаемый'
 begin
     errors = errors + 1;
 
@@ -238,6 +225,13 @@ endtask
 // Автоматическая проверка выходов.
 // Проверяем на negedge CLK, то есть после завершения обновлений DUT на posedge.
 // -----------------------------------------------------------------------------
+integer quant_index;
+integer quant_index_alt;
+reg expected_led_v1;
+reg expected_led_v1_2;
+reg expected_led_v2;
+reg expected_led_v1_2_alt;
+
 always @(negedge clk) begin
     #1;
 
