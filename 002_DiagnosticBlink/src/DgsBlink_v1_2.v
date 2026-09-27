@@ -9,7 +9,7 @@ MASK - маска выспышек, кажды бит отвечает за св
 заданного периода и длительности вспышки
 */
 
-module DgsBlink_v1_2
+module DgsBlink_v1m2
 #(
     parameter [63:0] FREQ_HZ   = 100*1000*1000,
     parameter [63:0] PERIOD_US = 10,

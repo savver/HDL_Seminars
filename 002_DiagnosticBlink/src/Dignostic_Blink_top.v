@@ -34,7 +34,7 @@ DgsBlink_v1			dsg_blink_1
 	.LED_OUT	(LEDs[0])
 );
 
-DgsBlink_v1_2  #( .FREQ_HZ   (100_000_000),
+DgsBlink_v1m2  #( .FREQ_HZ   (100_000_000),
                   .PERIOD_US (10),
                   .PULSE_US  (1) ) 
 dsg_blink_2
