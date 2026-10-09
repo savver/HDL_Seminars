@@ -9,7 +9,7 @@ wire       led_red;
 //assign 	mot_err   = 5'b11111;
 //assign 	fail_sens = 3'b111;
 
-MachineControl   dut
+MachineControl_top   dut
 (
 	.MOT_ERR		(mot_err),
 	.FAIL_SENSn	(fail_sensn),
