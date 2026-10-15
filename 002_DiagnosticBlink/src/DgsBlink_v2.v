@@ -26,7 +26,7 @@ module DgsBlink_v2
 );
 
 //localparam PERIOD = (FREQ_HZ/(1000*1000)) * PERIOD_US; - дробная часть потерялась ещё до умножения.
-  localparam PERIOD = (FREQ_HZ * PERIOD_US) / 1_000_000;
+//localparam PERIOD = (FREQ_HZ * PERIOD_US) / 1_000_000;
   
 //localparam PULSE  = (FREQ_HZ/(1000*1000)) * PULSE_US;
   localparam PULSE  = (FREQ_HZ * PULSE_US) / 1_000_000;

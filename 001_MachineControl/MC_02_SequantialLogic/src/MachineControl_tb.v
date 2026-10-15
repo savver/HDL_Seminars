@@ -13,7 +13,7 @@ wire       led_red;
 //assign 	mot_err   = 5'b11111;
 //assign 	fail_sens = 3'b111;
 
-MachineControl_02   dut
+MachineControl_02_top   dut
 (
 	.CLK			(clk),
 	.RSTn			(rstn),
