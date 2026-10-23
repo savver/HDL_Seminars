@@ -9,12 +9,20 @@ module Shift_Reg_Bus
 	output [WIDTH-1:0]	OUT
 );
 
-reg [BIT-1:0]   shift[WIDTH-1:0];
+genvar i;
+generate
+    for (i = 0; i < WIDTH; i = i + 1)
+    begin : gen_shift
 
-always @(posedge CLK) begin
-	shift <= { shift[BIT-2:0], IN };
-end
+        Shift_Reg  #( .BIT(BIT) )
+        shift_one_signal
+        (
+            .CLK (CLK),
+            .IN  (IN[i]),
+            .OUT (OUT[i])
+        );
 
-assign OUT = shift[BIT-1];
+    end
+endgenerate
 
 endmodule 

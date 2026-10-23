@@ -1,6 +1,6 @@
 module Shift_Reg
 #(
-   parameter BIT = 2
+   parameter BIT = 2  //must be >= 2
 )
 (
 	input       CLK,
